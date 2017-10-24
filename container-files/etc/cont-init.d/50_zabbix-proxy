@@ -34,6 +34,8 @@ write_zabbix_proxy_config() {
 
   echo "ProxyMode=${PROXYMODE}" > /etc/zabbix/zabbix_proxy.conf
   echo "Server=${SERVER}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "ServerPort=${SERVERPORT}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "LogType=console"
   echo "Hostname=${PROXYHOSTNAME}" >> /etc/zabbix/zabbix_proxy.conf
   echo "DBHost=${DBHOST}" >> /etc/zabbix/zabbix_proxy.conf
   echo "DBPort=${DBPORT}" >> /etc/zabbix/zabbix_proxy.conf
@@ -60,7 +62,7 @@ write_zabbix_proxy_config() {
 PROXYMODE=${ZBX_PROXYMODE:="0"}
 PROXYHOSTNAME=${ZBX_HOSTNAME:="Zabbix Proxy"}
 SERVER=${ZBX_SERVER_HOST:="localhost"}
-#SERVER_PORT=${ZBX_SERVER_PORT:="localhost"}
+SERVERPORT=${ZBX_SERVER_PORT:="10051"}
 DBHOST=${DB_SERVER_HOST:="postgres"}
 DBPORT=${DB_SERVER_PORT:="5432"}
 DBNAME=${PGSQL_DATABASE:="zabbix"}
