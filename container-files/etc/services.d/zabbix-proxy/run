@@ -1,3 +1,4 @@
 #!/bin/execlineb -P
 
+s6-setuidgid zabbix
 /usr/sbin/zabbix_proxy --config /etc/zabbix/zabbix_proxy.conf --foreground

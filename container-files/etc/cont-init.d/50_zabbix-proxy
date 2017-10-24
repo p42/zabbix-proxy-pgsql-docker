@@ -35,7 +35,7 @@ write_zabbix_proxy_config() {
   echo "ProxyMode=${PROXYMODE}" > /etc/zabbix/zabbix_proxy.conf
   echo "Server=${SERVER}" >> /etc/zabbix/zabbix_proxy.conf
   echo "ServerPort=${SERVERPORT}" >> /etc/zabbix/zabbix_proxy.conf
-  echo "LogType=console"
+  echo "LogType=console" >> /etc/zabbix/zabbix_proxy.conf
   echo "Hostname=${PROXYHOSTNAME}" >> /etc/zabbix/zabbix_proxy.conf
   echo "DBHost=${DBHOST}" >> /etc/zabbix/zabbix_proxy.conf
   echo "DBPort=${DBPORT}" >> /etc/zabbix/zabbix_proxy.conf
@@ -54,7 +54,6 @@ write_zabbix_proxy_config() {
   echo "CacheSize=${CACHESIZE}" >> /etc/zabbix/zabbix_proxy.conf
   echo "StartDBSyncers=${STARTDBSYNCERS}" >> /etc/zabbix/zabbix_proxy.conf
   echo "HistoryCacheSize=${HISTORYCACHESIZE}" >> /etc/zabbix/zabbix_proxy.conf
-  echo "HistoryTextCacheSize=${HISTORYTEXTCACHESIZE}" >> /etc/zabbix/zabbix_proxy.conf
   echo "ExternalScripts=/usr/lib/zabbix/externalscript" >> /etc/zabbix/zabbix_proxy.conf
 }
 
@@ -80,7 +79,6 @@ STARTHTTPPOLLERS=${ZBX_STARTHTTPPOLLERS:="1"}
 CACHESIZE=${ZBX_CACHESIZE:="8M"}
 STARTDBSYNCERS=${ZBX_STARTDBSYNCERS:="4"}
 HISTORYCACHESIZE=${ZBX_HISTORYCACHESIZE:="16M"}
-HISTORYTEXTCACHESIZE=${ZBX_HISTORYTEXTCACHESIZE:="16M"}
 
 write_zabbix_proxy_config
 
