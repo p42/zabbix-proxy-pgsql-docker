@@ -1,0 +1,87 @@
+#!/usr/bin/with-contenv sh
+
+# Shell Colors
+set_shell_error() {
+  echo -e "\e[1m" # Style: bold
+  echo -e "\e[5m" # Style: blink
+  echo -e "\e[31m" # Text Color: Red
+}
+
+set_shell_info() {
+  echo -e "\e[1m" # Style: bold
+  echo -e "\e[33m" # Text Color: Yellow
+}
+
+set_shell_pass() {
+  echo -e "\e[1m" # Style: bold
+  echo -e "\e[32m" # Text Color: Green
+}
+
+set_shell_warning() {
+  echo -e "\e[1m" # Style: bold
+  echo -e "\e[35m" # Text Color: Magenta
+}
+
+reset_shell() {
+  echo -e "\e[0m" # Reset all shell attributes
+}
+
+# Write Zabbix Proxy Config
+write_zabbix_proxy_config() {
+  set_shell_info
+  echo "Creating /etc/zabbix/zabbix_proxy.conf"
+  reset_shell
+
+  echo "ProxyMode=${PROXYMODE}" > /etc/zabbix/zabbix_proxy.conf
+  echo "Server=${SERVER}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "Hostname=${PROXYHOSTNAME}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "DBHost=${DBHOST}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "DBPort=${DBPORT}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "DBName=${DBNAME}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "DBUser=${DBUSER}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "DBPassword=${DBPASSWORD}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "ProxyOfflineBuffer=${PROXYOFFLINEBUFFER}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "ConfigFrequency=${CONFIGFREQUENCY}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "DataSenderFrequency=${DATASENDERFREQUENCY}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "StartPollers=${STARTPOLLERS}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "StartIPMIPollers=${STARTIPMIPOLLERS}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "StartTrappers=${STARTTRAPPERS}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "StartPingers=${STARTPINGERS}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "StartDiscoverers=${STARTDISCOVERS}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "StartHTTPPollers=${STARTHTTPPOLLERS}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "CacheSize=${CACHESIZE}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "StartDBSyncers=${STARTDBSYNCERS}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "HistoryCacheSize=${HISTORYCACHESIZE}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "HistoryTextCacheSize=${HISTORYTEXTCACHESIZE}" >> /etc/zabbix/zabbix_proxy.conf
+  echo "ExternalScripts=/usr/lib/zabbix/externalscript" >> /etc/zabbix/zabbix_proxy.conf
+}
+
+# Read ENV variables
+PROXYMODE=${ZBX_PROXYMODE:="0"}
+PROXYHOSTNAME=${ZBX_HOSTNAME:="Zabbix Proxy"}
+SERVER=${ZBX_SERVER_HOST:="localhost"}
+#SERVER_PORT=${ZBX_SERVER_PORT:="localhost"}
+DBHOST=${DB_SERVER_HOST:="postgres"}
+DBPORT=${DB_SERVER_PORT:="5432"}
+DBNAME=${PGSQL_DATABASE:="zabbix"}
+DBUSER=${PGSQL_USER:="zabbix"}
+DBPASSWORD=${PGSQL_PASSWORD:="zabbix"}
+PROXYOFFLINEBUFFER=${ZBX_PROXYOFFLINEBUFFER:="1"}
+CONFIGFREQUENCY=${ZBX_CONFIGFREQUENCY:="3600"}
+DATASENDERFREQUENCY=${ZBX_DATASENDERFREQUENCY:="1"}
+STARTPOLLERS=${ZBX_STARTPOLLERS:="5"}
+STARTIPMIPOLLERS=${ZBX_STARTIPMIPOLLERS:="0"}
+STARTTRAPPERS=${ZBX_STARTTRAPPERS:="5"}
+STARTPINGERS=${ZBX_STARTPINGERS:="1"}
+STARTDISCOVERS=${ZBX_STARTDISCOVERS:="1"}
+STARTHTTPPOLLERS=${ZBX_STARTHTTPPOLLERS:="1"}
+CACHESIZE=${ZBX_CACHESIZE:="8M"}
+STARTDBSYNCERS=${ZBX_STARTDBSYNCERS:="4"}
+HISTORYCACHESIZE=${ZBX_HISTORYCACHESIZE:="16M"}
+HISTORYTEXTCACHESIZE=${ZBX_HISTORYTEXTCACHESIZE:="16M"}
+
+write_zabbix_proxy_config
+
+set_shell_info
+echo "Completed Initializing Zabbix Proxy"
+reset_shell
