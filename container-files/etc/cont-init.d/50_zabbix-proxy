@@ -57,6 +57,66 @@ write_zabbix_proxy_config() {
   echo "ExternalScripts=/usr/lib/zabbix/externalscript" >> /etc/zabbix/zabbix_proxy.conf
 }
 
+create_db() {
+  export PGPASSWORD=${DBPASSWORD}; psql -U ${DBUSER} -h ${DBHOST} -p ${DBPORT} postgres -c "CREATE DATABASE ${DBNAME};"
+  export PGPASSWORD=${DBPASSWORD}; psql -U ${DBUSER} -h ${DBHOST} -p ${DBPORT} postgres -c "GRANT ALL PRIVILEGES ON DATABASE ${DBNAME} TO ${DBUSER};"
+}
+
+import_zabbix_db() {
+  export PGPASSWORD=${DBPASSWORD}; psql -U ${DBUSER} -h ${DBHOST} -p ${DBPORT} ${DBNAME} < ${ZABBIX_SQL_DIR}/schema.sql
+  # export PGPASSWORD=${DBPASSWORD}; psql -U ${DBUSER} -h ${DBHOST} -p ${DBPORT} ${DBNAME} < ${ZABBIX_SQL_DIR}/images.sql
+  # export PGPASSWORD=${DBPASSWORD}; psql -U ${DBUSER} -h ${DBHOST} -p ${DBPORT} ${DBNAME} < ${ZABBIX_SQL_DIR}/data.sql
+}
+
+check_zabbix_proxy_database() {
+  set_shell_info
+  echo "Checking if database exists and if a fresh install is required"
+  reset_shell
+
+  ZDBEXISTS=`export PGPASSWORD=${DBPASSWORD}; psql -U ${DBUSER} -h ${DBHOST} -p ${DBPORT} postgres -l | grep UTF8 | awk '{ print $1 }' | grep ^${DBNAME}$ | wc -l`
+  if [ "${ZDBEXISTS}" == "1" ]; then
+    set_shell_info
+    echo "Zabbix database exists, Checking if it has application data"
+    reset_shell
+
+    ZDBCONTENT=`export PGPASSWORD=${DBPASSWORD}; psql -U ${DBUSER} -h ${DBHOST} -p ${DBPORT} ${DBNAME} -c "\dt hosts" | grep hosts | cut -d "|" -f2 | sed 's/ //g' | grep ^hosts$ | wc -l`
+    if [ "${ZDBCONTENT}" == "1" ]; then
+      set_shell_info
+      echo "Zabbix database has application data"
+      reset_shell
+    else
+      set_shell_info
+      echo "Zabbix database has no application data, Initializing database"
+      reset_shell
+
+      import_zabbix_db
+
+      set_shell_info
+      echo "Import finished"
+      reset_shell
+    fi
+  else
+    set_shell_warning
+    echo "Zabbix database doesn't exists. Installing and importing default settings"
+    reset_shell
+
+    create_db
+
+    set_shell_info
+    echo "Database and user created, importing default SQL"
+    reset_shell
+
+    import_zabbix_db
+
+    set_shell_info
+    "Import finished"
+    reset_shell
+  fi
+}
+
+# variables
+ZABBIX_SQL_DIR="/usr/share/zabbix/database/postgresql"
+
 # Read ENV variables
 PROXYMODE=${ZBX_PROXYMODE:="0"}
 PROXYHOSTNAME=${ZBX_HOSTNAME:="Zabbix Proxy"}
@@ -80,7 +140,10 @@ CACHESIZE=${ZBX_CACHESIZE:="8M"}
 STARTDBSYNCERS=${ZBX_STARTDBSYNCERS:="4"}
 HISTORYCACHESIZE=${ZBX_HISTORYCACHESIZE:="16M"}
 
+
 write_zabbix_proxy_config
+
+check_zabbix_proxy_database
 
 set_shell_info
 echo "Completed Initializing Zabbix Proxy"
