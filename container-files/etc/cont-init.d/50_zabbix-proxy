@@ -57,9 +57,14 @@ write_zabbix_proxy_config() {
   echo "ExternalScripts=/usr/lib/zabbix/externalscript" >> /etc/zabbix/zabbix_proxy.conf
 }
 
+
+create_db_user() {
+  export PGPASSWORD=${DBADMINPASSWORD}; psql -U ${DBADMINUSER} -h ${DBHOST} -p ${DBPORT} ${DBADMINDATABASE} -c "CREATE USER ${DBUSER} WITH PASSWORD '${DBPASSWORD}' SUPERUSER;"
+}
+
 create_db() {
-  export PGPASSWORD=${DBPASSWORD}; psql -U ${DBUSER} -h ${DBHOST} -p ${DBPORT} postgres -c "CREATE DATABASE ${DBNAME};"
-  export PGPASSWORD=${DBPASSWORD}; psql -U ${DBUSER} -h ${DBHOST} -p ${DBPORT} postgres -c "GRANT ALL PRIVILEGES ON DATABASE ${DBNAME} TO ${DBUSER};"
+  export PGPASSWORD=${DBADMINPASSWORD}; psql -U ${DBADMINUSER} -h ${DBHOST} -p ${DBPORT} ${DBADMINDATABASE} -c "CREATE DATABASE ${DBNAME};"
+  export PGPASSWORD=${DBADMINPASSWORD}; psql -U ${DBADMINUSER} -h ${DBHOST} -p ${DBPORT} ${DBADMINDATABASE} -c "GRANT ALL PRIVILEGES ON DATABASE ${DBNAME} TO ${DBUSER};"
 }
 
 import_zabbix_db() {
@@ -70,10 +75,27 @@ import_zabbix_db() {
 
 check_zabbix_proxy_database() {
   set_shell_info
+  echo "Checking if user role exists"
+  reset_shell
+
+  ZDBUSEREXISTS=`export PGPASSWORD=${DBADMINPASSWORD}; psql -U ${DBADMINUSER} -h ${DBHOST} -p ${DBPORT} ${DBADMINDATABASE} -c "\du ${DBUSER}" | awk '{ print $1 }' | grep ^${DBUSER}$ | wc -l`
+  if [ "${ZDBUSEREXISTS}" == "1" ]; then
+    set_shell_info
+    echo "Zabbix database user exists"
+    reset_shell
+  else
+    set_shell_info
+    echo "Zabbix database user does not exists, creating"
+    reset_shell
+
+    create_db_user
+  fi
+
+  set_shell_info
   echo "Checking if database exists and if a fresh install is required"
   reset_shell
 
-  ZDBEXISTS=`export PGPASSWORD=${DBPASSWORD}; psql -U ${DBUSER} -h ${DBHOST} -p ${DBPORT} postgres -l | grep UTF8 | awk '{ print $1 }' | grep ^${DBNAME}$ | wc -l`
+  ZDBEXISTS=`export PGPASSWORD=${DBPASSWORD}; psql -U ${DBUSER} -h ${DBHOST} -p ${DBPORT} ${DBADMINDATABASE} -l | grep UTF8 | awk '{ print $1 }' | grep ^${DBNAME}$ | wc -l`
   if [ "${ZDBEXISTS}" == "1" ]; then
     set_shell_info
     echo "Zabbix database exists, Checking if it has application data"
@@ -109,7 +131,7 @@ check_zabbix_proxy_database() {
     import_zabbix_db
 
     set_shell_info
-    "Import finished"
+    echo "Import finished"
     reset_shell
   fi
 }
@@ -140,6 +162,8 @@ CACHESIZE=${ZBX_CACHESIZE:="8M"}
 STARTDBSYNCERS=${ZBX_STARTDBSYNCERS:="4"}
 HISTORYCACHESIZE=${ZBX_HISTORYCACHESIZE:="16M"}
 
+DBADMINUSER=${PGSQL_ADMIN_USER="postgres"}
+DBADMINPASSWORD=${PGSQL_ADMIN_PASSWORD="postgres"}
 
 write_zabbix_proxy_config
 
