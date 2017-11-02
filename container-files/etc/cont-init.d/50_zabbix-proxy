@@ -131,7 +131,7 @@ check_zabbix_proxy_database() {
     import_zabbix_db
 
     set_shell_info
-    "Import finished"
+    echo "Import finished"
     reset_shell
   fi
 }
