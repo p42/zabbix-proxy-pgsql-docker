@@ -34,8 +34,7 @@ write_zabbix_proxy_config() {
 
   echo "ProxyMode=${PROXYMODE}" > /etc/zabbix/zabbix_proxy.conf
   echo "Server=${SERVER}" >> /etc/zabbix/zabbix_proxy.conf
-  #echo "ServerPort=${SERVERPORT}" >> /etc/zabbix/zabbix_proxy.conf
-  echo "LogType=console" >> /etc/zabbix/zabbix_proxy.conf
+  echo "ServerPort=${SERVERPORT}" >> /etc/zabbix/zabbix_proxy.conf
   echo "Hostname=${PROXYHOSTNAME}" >> /etc/zabbix/zabbix_proxy.conf
   echo "DBHost=${DBHOST}" >> /etc/zabbix/zabbix_proxy.conf
   echo "DBPort=${DBPORT}" >> /etc/zabbix/zabbix_proxy.conf
@@ -54,7 +53,6 @@ write_zabbix_proxy_config() {
   echo "CacheSize=${CACHESIZE}" >> /etc/zabbix/zabbix_proxy.conf
   echo "StartDBSyncers=${STARTDBSYNCERS}" >> /etc/zabbix/zabbix_proxy.conf
   echo "HistoryCacheSize=${HISTORYCACHESIZE}" >> /etc/zabbix/zabbix_proxy.conf
-  echo "HistoryTextCacheSize=${HISTORYTEXTCACHESIZE}" >> /etc/zabbix/zabbix_proxy.conf
   echo "ExternalScripts=/usr/lib/zabbix/externalscript" >> /etc/zabbix/zabbix_proxy.conf
 }
 
@@ -144,7 +142,7 @@ ZABBIX_SQL_DIR="/usr/share/zabbix/database/postgresql"
 PROXYMODE=${ZBX_PROXYMODE:="0"}
 PROXYHOSTNAME=${ZBX_HOSTNAME:="Zabbix Proxy"}
 SERVER=${ZBX_SERVER_HOST:="localhost"}
-#SERVERPORT=${ZBX_SERVER_PORT:="10051"}
+SERVERPORT=${ZBX_SERVER_PORT:="10051"}
 DBHOST=${DB_SERVER_HOST:="postgres"}
 DBPORT=${DB_SERVER_PORT:="5432"}
 DBNAME=${PGSQL_DATABASE:="zabbix"}
@@ -162,7 +160,6 @@ STARTHTTPPOLLERS=${ZBX_STARTHTTPPOLLERS:="1"}
 CACHESIZE=${ZBX_CACHESIZE:="8M"}
 STARTDBSYNCERS=${ZBX_STARTDBSYNCERS:="4"}
 HISTORYCACHESIZE=${ZBX_HISTORYCACHESIZE:="16M"}
-HISTORYTEXTCACHESIZE=${ZBX_HISTORYTEXTCACHESIZE:="16M"}
 
 DBADMINUSER=${PGSQL_ADMIN_USER="postgres"}
 DBADMINPASSWORD=${PGSQL_ADMIN_PASSWORD="postgres"}
